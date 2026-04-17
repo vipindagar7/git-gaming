@@ -1,4 +1,5 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import OtpInput from '@/components/OtpInput';
 import Image from 'next/image';
@@ -87,6 +88,7 @@ export default function Home() {
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
   const timerRef = useRef(null);
+  const router = useRouter();
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -144,21 +146,19 @@ export default function Home() {
       });
       const rData = await rRes.json();
       if (!rData.success) return showToast(rData.message, false);
-
+      ' '
       showToast('Registration successful!');
-      setStep(2);
+
+      // small delay so user sees success
+      setTimeout(() => {
+        router.replace('https://docs.google.com/forms/d/e/1FAIpQLSdrQB8ABsKtAYTJjbACGtrtzwU3D2ZmAIJEsMkScQhL9k88nw/viewform');   // your page
+      }, 1000);
+      '===='
     } catch {
       showToast('Network error', false);
     } finally {
       setLoading(false);
     }
-  }
-
-  async function fetchUsers() {
-    const res = await fetch('/api/register');
-    const data = await res.json();
-    setUsers(data.users || []);
-    setShowUsers(true);
   }
 
   function reset() {
@@ -360,74 +360,15 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-
+              { }
               <button style={primaryBtn} className="btn-primary" onClick={reset}>
                 + Register Another
               </button>
-              <button className="btn-ghost" style={{ ...ghostBtn, marginTop: 10 }} onClick={fetchUsers}>
-                View All Users
-              </button>
+
             </div>
           )}
         </div>
 
-        {/* ── Users Table ──────────────────────────────────────────────────── */}
-        {showUsers && (
-          <div className="card-animate" style={{
-            width: '100%', maxWidth: 600, marginTop: 24,
-            background: '#0e0e1c', border: '1px solid #1e1e30',
-            borderRadius: 20, padding: '28px 28px',
-            boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ color: '#e8e8f0', margin: 0, fontWeight: 700, fontSize: 16 }}>
-                Registered Users
-              </h3>
-              <button onClick={() => setShowUsers(false)} style={{
-                background: 'none', border: 'none', color: '#5a5a7a',
-                fontSize: 18, cursor: 'pointer', lineHeight: 1,
-              }}>✕</button>
-            </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, fontFamily: 'var(--font-mono)' }}>
-                <thead>
-                  <tr>
-                    {['Name', 'Contact', 'Alt Contact', 'Type', 'Joined'].map((h) => (
-                      <th key={h} style={{
-                        padding: '10px 12px', textAlign: 'left',
-                        color: '#00c9a7', fontWeight: 600,
-                        borderBottom: '1px solid #1e1e30',
-                        letterSpacing: '0.06em', fontSize: 11, textTransform: 'uppercase',
-                      }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u, i) => (
-                    <tr key={u._id} style={{ borderBottom: '1px solid #1a1a28' }}>
-                      <td style={{ padding: '12px 12px', color: '#e8e8f0' }}>{u.name}</td>
-                      <td style={{ padding: '12px 12px', color: '#8888aa' }}>{u.contact}</td>
-                      <td style={{ padding: '12px 12px', color: '#8888aa' }}>{u.altContact || '—'}</td>
-                      <td style={{ padding: '12px 12px', color: u.type === 'student' ? '#00c9a7' : '#a78bfa' }}>
-                        {u.type === 'student' ? '🎓 Student' : '👤 Other'}
-                      </td>
-                      <td style={{ padding: '12px 12px', color: '#4a4a6a' }}>
-                        {new Date(u.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                  {users.length === 0 && (
-                    <tr>
-                      <td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#3a3a5a' }}>
-                        No users registered yet
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );

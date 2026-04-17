@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import otpGenerator from 'otp-generator';
 import { connectDB } from '@/lib/db';
 import { OTP } from '@/lib/models';
-import twilio from 'twilio';
+import { sendOTP } from '@/lib/sendOtp';
 
 export async function POST(request) {
     try {
@@ -30,16 +30,10 @@ export async function POST(request) {
         await OTP.findOneAndDelete({ contact });
         await OTP.create({ contact, otp, expiresAt });
 
-        // TODO (production): replace with Twilio / MSG91
-        // Twilio
-        
-        const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
-        await client.messages.create({
-            to: `+91${contact}`,
-            from: process.env.TWILIO_FROM,
-            body: `Your OTP is ${otp}. Valid for 5 minutes.`,
-        });
-
+        console.log(otp)
+       await sendOTP(contact, otp); 
+       
+       // Implement this function to call your SMS API
         return NextResponse.json({
             success: true,
             message: 'OTP sent successfully',

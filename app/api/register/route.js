@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { User } from '@/lib/models';
+import { StudentGaming } from '@/lib/models';
 
 export async function POST(request) {
   try {
@@ -15,10 +15,10 @@ export async function POST(request) {
 
     await connectDB();
 
-    const user = await User.create({ name, contact, altContact, type });
+    const user = await StudentGaming.create({ name, contact, altContact, type });
 
     return NextResponse.json(
-      { success: true, message: 'User registered successfully', user },
+      { success: true, message: 'StudentGaming registered successfully', user },
       { status: 201 }
     );
   } catch (err) {
@@ -33,13 +33,13 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
-  try {
-    await connectDB();
-    const users = await User.find().sort({ createdAt: -1 });
-    return NextResponse.json({ success: true, users });
-  } catch (err) {
-    console.error('fetch users error:', err);
-    return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
-  }
-}
+// export async function GET() {
+//   try {
+//     await connectDB();
+//     const users = await StudentGaming.find().sort({ createdAt: -1 });
+//     return NextResponse.json({ success: true, users });
+//   } catch (err) {
+//     console.error('fetch users error:', err);
+//     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
+//   }
+// }
